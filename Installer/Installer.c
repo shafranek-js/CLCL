@@ -709,6 +709,27 @@ static BOOL is_running(void)
 }
 
 /*
+ * Refuse a destination containing original CLCL binaries or its uninstall log.
+ * This prevents accidentally mixing installations and uninstall manifests.
+ */
+static BOOL contains_upstream_install(const TCHAR *dir)
+{
+	TCHAR path[MAX_PATH];
+	static const TCHAR * const upstream_files[] = {
+		TEXT("CLCL.exe"), TEXT("CLCLSet.exe"), TEXT("uninstall.dat")
+	};
+	int i;
+
+	for (i = 0; i < (int)(sizeof(upstream_files) / sizeof(upstream_files[0])); i++) {
+		if (build_path(path, MAX_PATH, dir, upstream_files[i]) == TRUE &&
+			GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/*
  * check_running - CLCLが起動中なら終了を促す
  */
 static BOOL check_running(const HWND hWnd)
@@ -795,14 +816,8 @@ static BOOL reg_get_string(const HKEY hKey, const TCHAR *name, TCHAR *buf, const
  */
 static BOOL reg_is_clcl(const TCHAR *display_name)
 {
-	int len = lstrlen(APP_NAME);
-
-	// 「CLCL」または「CLCL 」で始まる表示名を CLCL の登録とみなす
-	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE,
-		display_name, len, APP_NAME, len) != CSTR_EQUAL) {
-		return FALSE;
-	}
-	return (*(display_name + len) == TEXT('\0') || *(display_name + len) == TEXT(' ')) ? TRUE : FALSE;
+	// Only exact fork display names qualify. The original CLCL must not match.
+	return (lstrcmpi(display_name, APP_NAME) == 0) ? TRUE : FALSE;
 }
 
 /*
@@ -847,7 +862,8 @@ static int reg_find_install(REG_TARGET *list, const int max_cnt, TCHAR *install_
 			if (RegOpenKeyEx(hKey, subkey, 0, KEY_READ | view_list[i], &hSubKey) != ERROR_SUCCESS) {
 				continue;
 			}
-			if (reg_get_string(hSubKey, TEXT("DisplayName"), buf, MAX_PATH) == TRUE &&
+			if (lstrcmpi(subkey, UNINSTALL_SUBKEY) == 0 &&
+				reg_get_string(hSubKey, TEXT("DisplayName"), buf, MAX_PATH) == TRUE &&
 				reg_is_clcl(buf) == TRUE) {
 				(list + cnt)->root = root_list[i];
 				(list + cnt)->view = view_list[i];
@@ -1406,6 +1422,12 @@ static BOOL do_install(const HWND hDlg)
 	TCHAR *old_log;
 	BOOL ret;
 
+	// Never install into an existing original CLCL directory.
+	if (contains_upstream_install(install_path) == TRUE) {
+		msg_box(hDlg, IDS_ERR_LEGACY_INSTALL, MB_OK | MB_ICONWARNING, NULL);
+		return FALSE;
+	}
+
 	// CLCLが起動中なら終了を促す
 	if (check_running(hDlg) == FALSE) {
 		return FALSE;
@@ -1887,7 +1909,6 @@ static BOOL uninstall_file_check(const TCHAR *dir, const TCHAR *path, TCHAR *buf
 	TCHAR folder[MAX_PATH];
 	TCHAR link_dir[MAX_PATH];
 	const TCHAR *name;
-	int len;
 	int i;
 
 	if (path_normalize(path, buf) == FALSE) {
@@ -1897,13 +1918,10 @@ static BOOL uninstall_file_check(const TCHAR *dir, const TCHAR *path, TCHAR *buf
 	if (path_is_under(dir, buf) == TRUE) {
 		return TRUE;
 	}
-	// ショートカットの配置先の直下にある CLCL*.lnk
+	// Only a CLCL Next shortcut may be removed by this uninstaller.
 	for (name = buf + lstrlen(buf); name > buf && *(name - 1) != TEXT('\\'); name--)
 		;
-	len = lstrlen(APP_NAME);
-	if (name == buf ||
-		CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, name, len, APP_NAME, len) != CSTR_EQUAL ||
-		(len = lstrlen(name)) < 4 || lstrcmpi(name + len - 4, TEXT(".lnk")) != 0) {
+	if (name == buf || lstrcmpi(name, TEXT("CLCL Next.lnk")) != 0) {
 		return FALSE;
 	}
 	for (i = 0; i < (int)(sizeof(csidl_list) / sizeof(csidl_list[0])); i++) {

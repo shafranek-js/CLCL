@@ -14,30 +14,30 @@
 /* Define */
 #define BUF_SIZE						256
 
-#define APP_NAME						TEXT("CLCL")
-#define APP_EXE							TEXT("CLCL.exe")
-#define APP_PUBLISHER					TEXT("Ohno Tomoaki")
-#define APP_URL							TEXT("https://www.nakka.com/soft/clcl/")
-#define APP_DATA_FOLDER					TEXT("CLCL")
+#define APP_NAME						TEXT("CLCL Next")
+#define APP_EXE							TEXT("CLCLNext.exe")
+#define APP_PUBLISHER					TEXT("CLCL Next contributors")
+#define APP_URL							TEXT("https://github.com/shafranek-js/CLCL")
+#define APP_DATA_FOLDER					TEXT("CLCLNext")
 
 // CLCL本体の常駐確認用
-#define MAIN_WND_CLASS					TEXT("CLCLMain")
-#define MAIN_WINDOW_TITLE				TEXT("CLCL")
+#define MAIN_WND_CLASS					TEXT("CLCLNextMain")
+#define MAIN_WINDOW_TITLE				TEXT("CLCL Next")
 
 // インストール先の既定フォルダ名
-#define DEFAULT_FOLDER					TEXT("CLCL")
+#define DEFAULT_FOLDER					TEXT("CLCLNext")
 // インストール先に配置するアンインストーラ
-#define UNINSTALL_EXE					TEXT("uninstall.exe")
+#define UNINSTALL_EXE					TEXT("CLCLNextUninstall.exe")
 // インストールしたファイルの一覧
-#define UNINSTALL_LOG					TEXT("uninstall.dat")
+#define UNINSTALL_LOG					TEXT("clclnext-uninstall.dat")
 // 以前のインストーラがインストール先に残すファイルの一覧
-#define OLD_INSTALL_LOG					TEXT("install.DAT")
+#define OLD_INSTALL_LOG					TEXT("clclnext-legacy-install.dat")
 // 使用中で上書きできないファイルを退避するときの拡張子
 #define OLD_FILE_EXT					TEXT(".old")
 
 // アプリの一覧への登録先
 #define UNINSTALL_KEY					TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall")
-#define UNINSTALL_SUBKEY				TEXT("CLCL")
+#define UNINSTALL_SUBKEY				TEXT("CLCLNext")
 
 // コマンドラインオプション
 #define CMD_UNINSTALL					TEXT("/uninstall")

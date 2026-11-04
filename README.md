@@ -2,7 +2,7 @@
 
 **An independent development fork of [CLCL](https://github.com/nakkag/CLCL)**, the lightweight Windows clipboard manager by Ohno Tomoaki.
 
-> **Status: early development.** The source currently retains the original CLCL application name, version, storage paths, and installer identity. **Do not install CI builds over an existing CLCL installation** until separation and migration have been implemented and tested.
+> **Status: early development.** The source now has separate application names, mutexes, data directories, and uninstall identity. **Isolation has not yet passed manual install/uninstall tests. Do not deploy CI builds to a machine containing important CLCL data until those checks pass.**
 
 ## Goals
 
@@ -35,9 +35,9 @@ Alternatively, from PowerShell:
 
 Expected outputs:
 
-- `Release/CLCL.exe`
-- `Release/CLCLSet.exe`
-- `Installer/out/clcl*.exe` (installer; upstream naming/version retained for now)
+- `Release/CLCLNext.exe`
+- `Release/CLCLNextSet.exe`
+- `Installer/out/clcl-next-*-setup.exe` (installer; upstream numerical version retained until fork release versioning)
 
 ## Continuous integration
 
@@ -45,7 +45,7 @@ The [Windows CI workflow](.github/workflows/windows-ci.yml) builds the original 
 
 ## Development priorities
 
-See [Roadmap](docs/ROADMAP.md) and [Issues](https://github.com/shafranek-js/CLCL/issues). The first milestone is a repeatable baseline build, followed by isolated application identity and search.
+See [Roadmap](docs/ROADMAP.md) and [Issues](https://github.com/shafranek-js/CLCL/issues). The first milestone is a repeatable baseline build, followed by manual validation of the isolated application identity and then search.
 
 ## Upstream and attribution
 

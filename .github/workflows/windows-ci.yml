@@ -22,6 +22,10 @@ jobs:
       - name: Prepare MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Check fork identity isolation
+        shell: powershell
+        run: .\\scripts\\verify-isolation.ps1
+
       - name: Build application, settings and installer
         shell: powershell
         run: |
@@ -31,21 +35,21 @@ jobs:
       - name: Verify expected outputs
         shell: powershell
         run: |
-          $files = @('Release/CLCL.exe', 'Release/CLCLSet.exe')
+          $files = @('Release/CLCLNext.exe', 'Release/CLCLNextSet.exe')
           foreach ($file in $files) {
             if (-not (Test-Path $file)) { throw "Missing build output: $file" }
           }
-          $installers = @(Get-ChildItem 'Installer/out/clcl*.exe' -ErrorAction SilentlyContinue)
+          $installers = @(Get-ChildItem 'Installer/out/clcl-next-*-setup.exe' -ErrorAction SilentlyContinue)
           if ($installers.Count -eq 0) { throw 'Missing installer output in Installer/out' }
 
       - name: Upload unsigned CI artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: clcl-ci-windows-x86-unsigned
+          name: clcl-next-ci-windows-x86-unsigned
           path: |
-            Release/CLCL.exe
-            Release/CLCLSet.exe
-            Installer/out/clcl*.exe
+            Release/CLCLNext.exe
+            Release/CLCLNextSet.exe
+            Installer/out/clcl-next-*-setup.exe
             LICENSE
             readme_en.txt
           if-no-files-found: error

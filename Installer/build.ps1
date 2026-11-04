@@ -94,7 +94,7 @@ if ($LASTEXITCODE -ne 0) {
 	throw "ビルドに失敗しました。"
 }
 
-$targetPath = Join-Path $InstallerDir (Join-Path $Configuration "CLCLInst.exe")
+$targetPath = Join-Path $InstallerDir (Join-Path $Configuration "CLCLNextInst.exe")
 if (-not (Test-Path $targetPath)) {
 	throw "インストーラがビルドされていません: $targetPath"
 }

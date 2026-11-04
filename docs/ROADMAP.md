@@ -24,10 +24,10 @@ This is an **independent fork** of [nakkag/CLCL](https://github.com/nakkag/CLCL)
 
 ## Phase 1 — Separate identity and protect existing user data
 
-- [ ] Choose independent application / installer / uninstall registry identity and names.
-- [ ] Choose and test an isolated data directory (never overwrite stock `%LOCALAPPDATA%\CLCL`).
-- [ ] Define an explicit, backup-first migration/import route.
-- [ ] Validate both applications can coexist without running both clipboard watchers accidentally.
+- [x] Introduce independent application / installer / uninstall registry identity and names (code; testing pending).
+- [x] Introduce isolated `%LOCALAPPDATA%\CLCLNext` and portable `CLCLNextData` directories (manual testing pending).
+- [x] Remove automatic migration from original CLCL; explicit backup-first import remains future work.
+- [ ] Validate coexistence / clipboard watcher conflicts (fork checks if original is running at startup).
 - [ ] Add a safe installer / upgrade / uninstall regression checklist.
 
 **Done when:** test-install and uninstall do not modify an original CLCL installation or its data.

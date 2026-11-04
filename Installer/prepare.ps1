@@ -62,15 +62,15 @@ function Get-ClclVersion([string]$specified) {
 		Minor    = $minor
 		Revision = $revision
 		Text     = "$major.$minor.$revision"
-		FileName = "clcl$major$minor$revision.exe"
+		FileName = "clcl-next-$major.$minor.$revision-setup.exe"
 	}
 }
 
 # インストールするファイル (収集元のパス = インストール後のファイル名)
 function Get-TargetFiles([string]$binDir) {
 	return [ordered]@{
-		(Join-Path $binDir "CLCL.exe")        = "CLCL.exe"
-		(Join-Path $binDir "CLCLSet.exe")     = "CLCLSet.exe"
+		(Join-Path $binDir "CLCLNext.exe")        = "CLCLNext.exe"
+		(Join-Path $binDir "CLCLNextSet.exe")     = "CLCLNextSet.exe"
 		(Join-Path $RootDir "readme_jp.txt")  = "readme_jp.txt"
 		(Join-Path $RootDir "readme_en.txt")  = "readme_en.txt"
 		(Join-Path $RootDir "readme_de.txt")  = "readme_de.txt"

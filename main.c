@@ -51,8 +51,8 @@
 #include "resource.h"
 
 /* Define */
-#define ERROR_TITLE						TEXT("CLCL - Error")
-#define MUTEX							TEXT("_CLCL_Mutex_")
+#define ERROR_TITLE						TEXT("CLCL Next - Error")
+#define MUTEX							TEXT("_CLCLNext_Mutex_")
 
 #define WM_TRAY_NOTIFY					(WM_APP + 1000)		// タスクトレイ
 #define WM_KEY_HOOK						(WM_APP + 1001)		// フック
@@ -190,7 +190,6 @@ static BOOL winodw_end(const HWND hWnd);
 static LRESULT CALLBACK main_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK main_message_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static BOOL path_combine(TCHAR *buf, const TCHAR *dir, const TCHAR *name);
-static void copy_old_file(void);
 static void get_work_path(const HINSTANCE hInstance);
 static void commnad_line_func(const HWND hWnd);
 static BOOL init_application(const HINSTANCE hInstance);
@@ -2569,74 +2568,6 @@ static BOOL path_combine(TCHAR *buf, const TCHAR *dir, const TCHAR *name)
 }
 
 /*
- * copy_old_file - 旧バージョンのファイルを移行
- */
-static void copy_old_file(void)
-{
-	static const TCHAR *old_files[] = {USER_INI, HISTORY_FILENAME, REGIST_FILENAME};
-	TCHAR general_ini_path[MAX_PATH];
-	TCHAR tmp_path[MAX_PATH];
-	TCHAR old_path[MAX_PATH];
-	TCHAR old_file[MAX_PATH];
-	TCHAR new_file[MAX_PATH];
-	TCHAR user_name[BUF_SIZE];
-	TCHAR buf[BUF_SIZE];
-	DWORD i;
-
-	lstrcpy(tmp_path, app_path);
-
-	// 現在のログインユーザ名の取得
-	i = BUF_SIZE - 1;
-	if (GetUserName(user_name, &i) == FALSE) {
-		lstrcpy(user_name, DEFAULT_USER);
-	}
-
-	// 共通の設定を使用する場合のユーザ名の取得
-	if (path_combine(general_ini_path, app_path, GENERAL_INI) == FALSE) {
-		return;
-	}
-	if (PathFileExists(general_ini_path) == FALSE) {
-		if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, tmp_path))) {
-			return;
-		}
-		if (path_combine(tmp_path, tmp_path, TEXT("VirtualStore\\Program Files (x86)\\CLCL")) == FALSE ||
-			path_combine(general_ini_path, tmp_path, GENERAL_INI) == FALSE) {
-			return;
-		}
-		if (PathFileExists(general_ini_path) == FALSE) {
-			return;
-		}
-	}
-
-	profile_initialize(general_ini_path, TRUE);
-	profile_get_string(TEXT("GENERAL"), TEXT("User"), TEXT(""), buf, BUF_SIZE - 1, general_ini_path);
-	profile_write_string(TEXT("GENERAL"), TEXT("User"), buf, general_ini_path);
-	if (*buf != TEXT('\0')) {
-		lstrcpy(user_name, buf);
-	}
-	profile_get_string(TEXT("GENERAL"), TEXT("WorkDir"), TEXT(""), buf, BUF_SIZE - 1, general_ini_path);
-	profile_write_string(TEXT("GENERAL"), TEXT("WorkDir"), buf, general_ini_path);
-	if (*buf != TEXT('\0')) {
-		lstrcpy(tmp_path, buf);
-	}
-	profile_flush(general_ini_path);
-	profile_free();
-
-	file_name_conv(user_name, TEXT('_'));
-
-	// パスが長すぎる場合は移行しない
-	if (path_combine(old_path, tmp_path, user_name) == FALSE) {
-		return;
-	}
-	for (i = 0; i < sizeof(old_files) / sizeof(old_files[0]); i++) {
-		if (path_combine(old_file, old_path, old_files[i]) == TRUE &&
-			path_combine(new_file, work_path, old_files[i]) == TRUE) {
-			CopyFile(old_file, new_file, TRUE);
-		}
-	}
-}
-
-/*
  * get_work_path - 作業ディレクトリの作成
  */
 static void get_work_path(const HINSTANCE hInstance)
@@ -2666,19 +2597,16 @@ static void get_work_path(const HINSTANCE hInstance)
 		profile_free();
 	}
 	if (portable == 1) {
-		lstrcpy(work_path, app_path);
-	}
-	else {
-		BOOL check_old_path = FALSE;
-		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, work_path))) {
-			lstrcat(work_path, TEXT("\\CLCL"));
-			if (PathFileExists(work_path) == FALSE) {
-				check_old_path = TRUE;
-			}
+		// Keep portable fork data separate, even when binaries share a directory.
+		if (path_combine(work_path, app_path, TEXT("CLCLNextData")) == TRUE) {
 			CreateDirectory(work_path, NULL);
 		}
-		if (check_old_path) {
-			copy_old_file();
+	}
+	else {
+		// Never read or auto-migrate the original CLCL user profile.
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, work_path)) &&
+			path_combine(work_path, work_path, TEXT("CLCLNext")) == TRUE) {
+			CreateDirectory(work_path, NULL);
 		}
 	}
 }
@@ -2811,6 +2739,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 	// DLL の検索先を限定
 	security_initialize();
+
+	// Avoid conflicting clipboard watchers and Alt+C hotkeys at startup.
+	// The original CLCL application remains untouched.
+	if (FindWindow(TEXT("CLCLMain"), TEXT("CLCL")) != NULL) {
+		MessageBox(NULL,
+			TEXT("Original CLCL is running. Please exit it before starting CLCL Next to avoid conflicting clipboard watchers and hotkeys."),
+			ERROR_TITLE, MB_OK | MB_ICONWARNING);
+		return 0;
+	}
 
 #ifndef _DEBUG
 	// 2重起動チェック

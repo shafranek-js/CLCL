@@ -20,21 +20,21 @@
 /* Define */
 #define BUF_SIZE						256
 
-#define APP_NAME						TEXT("CLCL")
+#define APP_NAME						TEXT("CLCL Next")
 #define APP_VAR							221
 
-#define MAIN_WND_CLASS					TEXT("CLCLMain")
+#define MAIN_WND_CLASS					TEXT("CLCLNextMain")
 #define MAIN_WINDOW_TITLE				APP_NAME
 
 #define DEFAULT_USER					TEXT("DEFAULT")
 #define GENERAL_INI						TEXT("general.ini")
-#define APP_INI							TEXT("clcl_app.ini")
-#define USER_INI						TEXT("clcl.ini")
+#define APP_INI							TEXT("clclnext_app.ini")
+#define USER_INI						TEXT("clclnext.ini")
 #define HISTORY_FILENAME				TEXT("history.dat")
 #define REGIST_FILENAME					TEXT("regist.dat")
 
-#define MAIN_EXE						TEXT("CLCL.exe")
-#define OPTION_EXE						TEXT("CLCLSet.exe")
+#define MAIN_EXE						TEXT("CLCLNext.exe")
+#define OPTION_EXE						TEXT("CLCLNextSet.exe")
 
 #define HKEY_ID							0x0300			// ホットキーID
 

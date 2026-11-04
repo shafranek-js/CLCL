@@ -48,10 +48,10 @@
 #include "resource.h"
 
 /* Define */
-#define ERROR_TITLE						TEXT("CLCLSet - Error")
+#define ERROR_TITLE						TEXT("CLCL Next Settings - Error")
 // 本体へのメッセージの応答を待つ時間(ミリ秒)
 #define SEND_MAIN_TIMEOUT				10000
-#define MUTEX							TEXT("_CLCLSET_Mutex_")
+#define MUTEX							TEXT("_CLCLNextSET_Mutex_")
 
 #define ABS(n)							((n < 0) ? (n * -1) : n)
 
@@ -709,11 +709,12 @@ static void get_work_path(const HINSTANCE hInstance)
 		profile_free();
 	}
 	if (portable == 1) {
-		lstrcpyn(work_path, app_path, MAX_PATH);
+		wnsprintf(work_path, MAX_PATH, TEXT("%s\\CLCLNextData"), app_path);
+		CreateDirectory(work_path, NULL);
 	}
 	else {
 		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, app_data_path))) {
-			wnsprintf(work_path, MAX_PATH, TEXT("%s\\CLCL"), app_data_path);
+			wnsprintf(work_path, MAX_PATH, TEXT("%s\\CLCLNext"), app_data_path);
 			CreateDirectory(work_path, NULL);
 		}
 	}

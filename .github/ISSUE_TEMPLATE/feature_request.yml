@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a focused CLCL Next improvement
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        CLCL Next aims to stay lightweight, native, and keyboard-first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: What should become easier or more reliable?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that define success.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Compatibility, performance, security and alternatives
+      description: Optional

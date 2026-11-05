@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible problem in CLCL Next
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include passwords, access tokens, private clipboard contents, or confidential files.
+        Please verify that the problem occurs in CLCL Next.
+  - type: input
+    id: build
+    attributes:
+      label: CLCL Next build
+      placeholder: "Version, commit SHA, or GitHub Actions run"
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows version
+      options:
+        - Windows 11
+        - Windows 10
+        - Other / unknown
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Use only nonsensitive sample data.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Diagnostics and screenshots
+      description: Optional; redact all sensitive content.
